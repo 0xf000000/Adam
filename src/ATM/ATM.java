@@ -1,11 +1,9 @@
 package ATM;
 
 import java.io.BufferedReader;
+import utils.GenerateHash;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collection;
-
 import users.Account;
 import utils.Utils;
 /**
@@ -15,19 +13,9 @@ import utils.Utils;
  */
 
 public class ATM {
-	ArrayList<Account> accountList = new ArrayList<Account>();
 	private int ATMchange = 20000;
 	Utils utils = new Utils();
-	
-	public ATM(Collection<Account> accounts) {
-		accountList.addAll(accounts);
-		
-	}
-	
-	public ATM(Account account) {
-		accountList.add(account);
-	}
-	
+	GenerateHash gh = new GenerateHash();
 	public ATM() {
 		
 	}
@@ -47,7 +35,7 @@ public class ATM {
 			 try {
 				 System.out.println("if you want to quit please enter 'exit'");
 				 System.out.print(" please Enter your cardnumber: ");
-				 String cardNumber = in.readLine(); 
+				 String cardNumber =gh.vormatInput(in.readLine()); 
 				 Account current;
 				
 				if(cardNumber.equals("exit")) {
@@ -66,17 +54,14 @@ public class ATM {
 				System.out.println( sql.checkCardID(cardNumber));
 				
 				
-				System.out.println("please Enter your Password: ");
-				String password = in.readLine();
-				
-				current = sql.checkPassword(password);
+				System.out.print("please Enter your Password: ");
+				String password = gh.vormatInput(in.readLine());
+
+				current = sql.checkPassword(password,cardNumber);
 				 
-				if(current != null) {
+				if(current != null ) {
 					menu(current);
 				}
-			 
-				
-				 
 			 }catch( Exception e ) {
 				 e.printStackTrace();
 			 }
@@ -99,6 +84,7 @@ public class ATM {
 		int ch = 0;
 		do {
 			utils.clearScreen();
+			System.out.println("Hello "  + current.getName() + "!");
 			System.out.print("Main Menu \n1.Show Balance\n2.Withdraw\n3.Options\n4.Make Transfer\n5.exit\n"); 
 			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		
@@ -166,6 +152,7 @@ public class ATM {
 		
 		double currentbalance = current.getBalance() - money;
 		current.setBalance(currentbalance);
+		
 		ATMchange -= money;
 		System.out.print(money + "€ got sucessfully withdrawn from your bank account new balance: " + current.getBalance() + "€\n");
 		

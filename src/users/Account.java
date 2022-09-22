@@ -1,54 +1,26 @@
 package users;
 /**
- * this class is a dataclass for our users to get their information.
+ * this is a dataclass for our users to store userdata temporary in our programm
+ * 
  * @author leon
  *
  */
 public class Account {
-	private String cardNr;
 	private double balance; 
 	private  String username;
-	private String password;
 	private String ipaddr;
 	
-	/**
-	 * no getter or setter for a password
-	 * @param cardNr
-	 * @param balance
-	 * @param name
-	 * @param password
-	 * @param ipaddr
-	 */
-	public Account(String cardNr, double balance, String username, String password, String ipaddr) {
-		
-		this.setCardNr(cardNr); 
+	public Account( double balance, String username,String ipaddr) {
+	
 		this.setBalance(balance); 
-		this.setName(username);
-		this.setPassword(password); 
+		this.setName(username); 
 	}
 	
-	public Account (String cardNr) {
-		this.cardNr = cardNr;
+	public Account(double balance , String username) {
+		this.balance = balance; 
+		this.username = username; 
 	}
 	
-	public Account (String cardNr, String Password) {
-		this.cardNr = cardNr;
-		this.password = Password;
-	}
-	public Account(String cardNr, String Password, double balance) {
-		this.cardNr = cardNr;
-		this.password = Password;
-		this.balance = balance;
-	}
-
-	public String getCardNr() {
-		return cardNr;
-	}
-
-	public void setCardNr(String cardNr) {
-		this.cardNr = cardNr;
-	}
-
 	public double getBalance() {
 		return balance;
 	}
@@ -72,16 +44,7 @@ public class Account {
 
 	public void setIpaddr(String ipaddr) {
 		this.ipaddr = ipaddr;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-	
+	}	
 	
 	
 
