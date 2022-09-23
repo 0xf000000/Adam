@@ -58,25 +58,28 @@ public class mysqlConnector {
 		return false;
 	}
 	
-	
-	public void withdrawFromAccount(Account current ) throws SQLException {
-		String QUERY = "UPDATE users SET balance = " + current.getBalance() ;
+	/**
+	 * Goes to our sql Database and changes the amount of money thats stored in our database.
+	 * @param current
+	 * @throws SQLException
+	 */
+	public void withdrawFromAccount(Account current, String cardNr ) throws SQLException {
+		String QUERY = "UPDATE users SET balance = " + current.getBalance()+"WHERE cardNr = " + cardNr ;
 		Connection con = getDB(); 
 		Statement stm = con.createStatement();
 		stm.executeUpdate(QUERY);
-		
-		
+		stm.close();
+		con.close();
 	}
 	/**
 	 * this method checks the password from the userinput and looks if it is the same in our database
 	 * @change right now the db is saving the passowrd hardcoded in the db. this should be changed into a hash that gets stored in a separate table with a connection to our other table 
 	 * @param password
 	 * @param cardnr
-	 * @return
+	 * @return returns a <code> account </code> object that holds the information needed for the menu. if the password is wrong it will return null.
 	 */
-	public Account checkPassword(String password, String cardnr) {
+	public boolean checkPassword(String cardnr, String password) {
 		final String QUERY = "SELECT password, cardNr FROM users WHERE password  = '"+ password +"' AND cardNr = '" + cardnr + "'";
-		final String GETACCOUNT = "SELECT username, balance FROM users WHERE password = '"+ password +"' AND cardNr = '" + cardnr + "' ORDER BY username";
 		String cardNR ="";
 		String Password ="";
 		Connection con = null;
@@ -94,23 +97,12 @@ public class mysqlConnector {
 			stm.close();
 			if(Password == null || cardNR == null) {
 				System.err.println("Password or cardNr is wrong sorry :("); 
-				
-				return null;
+				return false;
 			}
-			
-		
 			if(password.equals(Password) && cardNR.equals(cardnr) ) {
-				Statement stm2 = con.createStatement();
-				ResultSet rs2 = stm2.executeQuery(GETACCOUNT);
-				String username = "";
-				double balance = 0;
-				while(rs2.next()) {
-					username = rs2.getString("username");
-					balance = rs2.getDouble("balance");
-				}
+				System.out.println("login sucessfully ");
+				return true;
 				
-				
-				return new Account(balance,username);
 			}
 			
 		}catch(SQLException e ) {
@@ -118,7 +110,73 @@ public class mysqlConnector {
 		}
 		
 		System.err.print("Sorry wrong Password please try it again\n"); 
-		return null;
+		return false;
+	}
+	
+	/**
+	 * this method gets the requested account
+	 * @param CardNr
+	 * @param Password
+	 * @return
+	 * @throws SQLException
+	 */
+	public Account getAccount(String cardnr, String password)throws SQLException {
+		final String QUERY = "SELECT username, balance, cardNr, password FROM users WHERE password = '"+ password +"' AND cardNr = '" + cardnr + "' ORDER BY username";
+		String username = "";
+		String cardNr = "";
+		double balance = 0;
+		Connection con = getDB();
+		Statement stm = con.createStatement();
+		ResultSet rs = stm.executeQuery(QUERY);
+		while(rs.next()) {
+			username = rs.getString("username");
+			balance = rs.getDouble("balance");
+			cardNr = rs.getString("cardNr");
+		}
+		
+		if(username.equals("")) {
+			System.out.print("sorry this User doesnt exit");
+			return null;
+		}
+		
+		
+		return new Account(balance,username,cardNr);
+		
+		
+	}
+	
+	/**
+	 * transfers money from one account to another
+	 * @param current
+	 * @param balance
+	 * @param cardnr
+	 * @return
+	 * @throws SQLException
+	 */
+	public boolean tranfer( Account current, double balance, String cardnr)throws SQLException {
+		String QUERY = "SELECT cardnr,balance FROM users WHERE cardnr =  " + cardnr; 
+		Connection con = getDB();
+		Statement stm = con.createStatement();
+		ResultSet rs  = stm.executeQuery(QUERY);
+		double ReciverAccountBalance = 0;
+		while(rs.next()) {
+			ReciverAccountBalance  = rs.getDouble("balance");
+			
+		}
+		double balanceReciver = ReciverAccountBalance + balance;
+		String QUERY2 = "UPDATE users SET balance = " + balanceReciver +"WHERE cardnr = "+ cardnr ; 
+		Statement stm2 = con.createStatement();
+		stm2.executeUpdate(QUERY2);
+		stm2.close();
+		con.close();
+		// withdraws from the account that sends it
+		double currentbalance = current.getBalance() - balance;
+		current.setBalance(currentbalance);
+		withdrawFromAccount(current, current.getCardNr() );
+		
+		//sends the cash to to requested account
+		
+		return false; 
 	}
 	
 	

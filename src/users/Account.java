@@ -10,16 +10,22 @@ public class Account {
 	private double balance; 
 	private  String username;
 	private String ipaddr;
+	private String cardNr;
 	
-	public Account( double balance, String username,String ipaddr) {
+	public Account( double balance, String username) {
 	
 		this.setBalance(balance); 
 		this.setName(username); 
 	}
 	
-	public Account(double balance , String username) {
+	public Account(double balance , String username, String cardNr) {
 		this.balance = balance; 
 		this.username = username; 
+		this.cardNr = cardNr;
+		
+	}
+	public String getCardNr() {
+		return cardNr;
 	}
 	
 	public double getBalance() {

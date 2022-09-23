@@ -16,10 +16,11 @@ import utils.Utils;
 
 public class ATM {
 	private int ATMchange = 20000;
+	mysqlConnector sql;
 	Utils utils = new Utils();
 	GenerateHash gh = new GenerateHash();
 	public ATM() {
-		
+		this.sql = new mysqlConnector();
 	}
 	/**
 	 * starts the instance of our ATM
@@ -30,7 +31,7 @@ public class ATM {
 		String banner = "Banner.txt";
 		utils.printASCII(banner);
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-		mysqlConnector sql = new mysqlConnector(); 
+		
 		
 		System.out.print("Welcome");
 		while(true){
@@ -38,6 +39,7 @@ public class ATM {
 				 System.out.println("if you want to quit please enter 'exit'");
 				 System.out.print(" please Enter your cardnumber: ");
 				 String cardNumber =gh.vormatInput(in.readLine()); 
+				 String password = null;
 				 Account current;
 				
 				if(cardNumber.equals("exit")) {
@@ -57,13 +59,18 @@ public class ATM {
 				
 				
 				System.out.print("please Enter your Password: ");
-				String password = gh.vormatInput(in.readLine());
+				 password = gh.vormatInput(in.readLine());
 
-				current = sql.checkPassword(password,cardNumber);
-				 
-				if(current != null ) {
-					menu(current);
+				if(sql.checkPassword(cardNumber,password)) {
+					
+				current =sql.getAccount(cardNumber, password);
+				menu(current);
+				}else {
+					
+					System.err.print("sorry something went wront \n");
 				}
+				 
+				
 			 }catch( Exception e ) {
 				 e.printStackTrace();
 			 }
@@ -118,7 +125,12 @@ public class ATM {
 			// this method should provide a possibility to change your password or connected email adress 
 			
 			case 4:
-				transfer(current, in);
+				try {
+					transfer(current, in);
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				
 				
 				break; 
@@ -157,7 +169,7 @@ public class ATM {
 		double currentbalance = current.getBalance() - money;
 		current.setBalance(currentbalance);
 		try {
-			sql.withdrawFromAccount(current);
+			sql.withdrawFromAccount(current, current.getCardNr() );
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -166,22 +178,36 @@ public class ATM {
 		System.out.print(money + "€ got sucessfully withdrawn from your bank account new balance: " + current.getBalance() + "€\n");
 		
 	}
+
 	/**
-	 * 
 	 * @param Account current
 	 * @param BufferedReader in
+	 * @throws SQLException 
 	 */
-	private void transfer(Account current, BufferedReader in) {
-		System.out.print("Please Enter the name of the person you want to transfer money to: "); 
+	private void transfer(Account current, BufferedReader in) throws SQLException {
+		
 		try {
-			String name  = in.readLine();
 			System.out.print("Please enter the card Id of the person you want to transfer to");
+			
 			String cardNR = in.readLine();
+			
+			if(!sql.checkCardID(cardNR)) {
+				System.err.print("sorry this Account doesn't exist!\n ");
+				return;
+			}
+			
+			System.out.print("please enter the amount of money you want to transfer"); 
+			double balance =  Double.parseDouble(in.readLine());
+			
+			
+			sql.tranfer(current, balance, cardNR);
+			System.out.println("---> Transfer complete");
 		}catch(IOException e) {
 			e.printStackTrace();
 		}
 		
 	}
+	
 	
 	
 	
