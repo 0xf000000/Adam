@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import utils.GenerateHash;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.SQLException;
+
 import users.Account;
 import utils.Utils;
 /**
@@ -85,7 +87,9 @@ public class ATM {
 		do {
 			utils.clearScreen();
 			System.out.println("Hello "  + current.getName() + "!");
-			System.out.print("Main Menu \n1.Show Balance\n2.Withdraw\n3.Options\n4.Make Transfer\n5.exit\n"); 
+			System.out.println("------------------------MENU--------------------------");
+			System.out.print("\tMain Menu \n\n\t1.Show Balance\n\t2.Withdraw\n\t3.Options\n\t4.Make Transfer\n\t5.exit\n"); 
+			System.out.println("------------------------------------------------------");
 			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		
 		
@@ -105,7 +109,7 @@ public class ATM {
 				break;
 			case 2 : 
 				utils.clearScreen();
-				System.out.println("Okay please Enter the amount to withdraw: ");
+				System.out.print("Okay please Enter the amount to withdraw: ");
 				double money = Integer.parseInt(in.readLine());
 				
 				withdraw(money,current);
@@ -140,7 +144,7 @@ public class ATM {
 	 * @return
 	 */
 	private void withdraw(double money, Account current ) {
-		
+		mysqlConnector sql = new mysqlConnector();
 		if(money >  ATMchange) {
 			System.err.print("Sorry there is not enough money in this ATM\n");
 			return;
@@ -152,16 +156,27 @@ public class ATM {
 		
 		double currentbalance = current.getBalance() - money;
 		current.setBalance(currentbalance);
-		
+		try {
+			sql.withdrawFromAccount(current);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		ATMchange -= money;
 		System.out.print(money + "€ got sucessfully withdrawn from your bank account new balance: " + current.getBalance() + "€\n");
 		
 	}
-	// want to refaktor the login mechanism so it doesnt make sence to implement that now just to change it then 
+	/**
+	 * 
+	 * @param Account current
+	 * @param BufferedReader in
+	 */
 	private void transfer(Account current, BufferedReader in) {
 		System.out.print("Please Enter the name of the person you want to transfer money to: "); 
 		try {
 			String name  = in.readLine();
+			System.out.print("Please enter the card Id of the person you want to transfer to");
+			String cardNR = in.readLine();
 		}catch(IOException e) {
 			e.printStackTrace();
 		}

@@ -1,6 +1,7 @@
 package users;
 /**
  * this is a dataclass for our users to store userdata temporary in our programm
+ * @TODO this method should store the ip adress of the user so we can be safe it is our user.
  * 
  * @author leon
  *

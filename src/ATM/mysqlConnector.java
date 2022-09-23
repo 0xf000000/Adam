@@ -25,7 +25,11 @@ public class mysqlConnector {
 		
 	}
 	
-	
+	/**
+	 * this method checks if the card ID from the userinput exists.
+	 * @param cardNR
+	 * @return if the cardNr exists in our database this method will return true. If not false
+	 */
 	public boolean checkCardID( String cardNR){
 		Statement stm = null;
 		Connection con = null;
@@ -46,12 +50,6 @@ public class mysqlConnector {
 				con.close();
 				return true;
 			}
-			
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
 			con.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -61,14 +59,21 @@ public class mysqlConnector {
 	}
 	
 	
-	public void withdrawFromAccount(Account current, double balance) throws SQLException {
-		String QUERY = "ALTER TABLE users WHERE username = " + current.getName()+ " MODIFY balance = " + balance ;
+	public void withdrawFromAccount(Account current ) throws SQLException {
+		String QUERY = "UPDATE users SET balance = " + current.getBalance() ;
 		Connection con = getDB(); 
 		Statement stm = con.createStatement();
+		stm.executeUpdate(QUERY);
 		
 		
 	}
-	
+	/**
+	 * this method checks the password from the userinput and looks if it is the same in our database
+	 * @change right now the db is saving the passowrd hardcoded in the db. this should be changed into a hash that gets stored in a separate table with a connection to our other table 
+	 * @param password
+	 * @param cardnr
+	 * @return
+	 */
 	public Account checkPassword(String password, String cardnr) {
 		final String QUERY = "SELECT password, cardNr FROM users WHERE password  = '"+ password +"' AND cardNr = '" + cardnr + "'";
 		final String GETACCOUNT = "SELECT username, balance FROM users WHERE password = '"+ password +"' AND cardNr = '" + cardnr + "' ORDER BY username";
