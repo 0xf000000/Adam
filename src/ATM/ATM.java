@@ -1,7 +1,8 @@
 package ATM;
 
 import java.io.BufferedReader;
-import utils.GenerateHash;
+import utils.Security;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
@@ -18,7 +19,7 @@ public class ATM {
 	private int ATMchange = 20000;
 	mysqlConnector sql;
 	Utils utils = new Utils();
-	GenerateHash gh = new GenerateHash();
+	Security gh = new Security();
 	public ATM() {
 		this.sql = new mysqlConnector();
 	}
@@ -60,7 +61,7 @@ public class ATM {
 				
 				System.out.print("please Enter your Password: ");
 				 password = gh.vormatInput(in.readLine());
-
+				 String hashedPassword = gh.generateHash(password);
 				if(sql.checkPassword(cardNumber,password)) {
 					
 				current =sql.getAccount(cardNumber, password);
@@ -69,14 +70,9 @@ public class ATM {
 					
 					System.err.print("sorry something went wront \n");
 				}
-				 
-				
 			 }catch( Exception e ) {
 				 e.printStackTrace();
 			 }
-			
-			 
-			 
 		}
 		
 	}
@@ -121,9 +117,10 @@ public class ATM {
 				
 				withdraw(money,current);
 				break; 
-			case 3: break; 
+			case 3: 
 			// this method should provide a possibility to change your password or connected email adress 
-			
+			options();
+			break; 
 			case 4:
 				try {
 					transfer(current, in);
@@ -187,7 +184,7 @@ public class ATM {
 	private void transfer(Account current, BufferedReader in) throws SQLException {
 		
 		try {
-			System.out.print("Please enter the card Id of the person you want to transfer to");
+			System.out.print("Please enter the card Id of the person you want to transfer to: ");
 			
 			String cardNR = in.readLine();
 			
@@ -205,6 +202,12 @@ public class ATM {
 		}catch(IOException e) {
 			e.printStackTrace();
 		}
+		
+	}
+	
+	private void options() {
+		System.out.print("\tOptions");
+		System.out.print("1.change Pasword\n2.connect Email to Account\n3.back To the Menu\n");
 		
 	}
 	
