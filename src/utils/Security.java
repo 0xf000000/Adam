@@ -12,18 +12,18 @@ public class Security {
 
 	
 	public String  vormatInput(String input) {
-		input = input.replaceAll("<|>|/|","");
-		
+		input = input.replaceAll("<|>|/","");
 		
 		return input;
 	}
 	
 	
-	
+
 	/**
 	 * This method generates a Hash from our password with 'SHA-256'
 	 * @return the hashed Password 
 	 */
+	
 	public String generateHash(String hash) {
 		MessageDigest digest = null;
 		byte[]  bytes= null; 

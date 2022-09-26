@@ -72,29 +72,40 @@ public class mysqlConnector {
 		con.close();
 	}
 	/**
-	 * this method checks the password from the userinput and looks if it is the same in our database
+	 * this method checks the password from the user input and looks if it is the same in our database also checks if we got the same id at the hash.
 	 * @change right now the db is saving the passowrd hardcoded in the db. this should be changed into a hash that gets stored in a separate table with a connection to our other table 
 	 * @param password
 	 * @param cardnr
 	 * @return returns a <code> account </code> object that holds the information needed for the menu. if the password is wrong it will return null.
+	 * @throws SQLException 
 	 */
-	public boolean checkPassword(String cardnr, String password) {
-		final String QUERY = "SELECT password, cardNr FROM users WHERE password  = '"+ password +"' AND cardNr = '" + cardnr + "'";
+	public boolean checkPassword(String cardnr, String password) throws SQLException {
+		final String QUERY = "SELECT id,cardNr FROM users WHERE cardNr = '" + cardnr + "'";
 		String cardNR ="";
 		String Password ="";
+		int id = 0;
 		Connection con = null;
-		try {
+		
 			con = getDB();
 			
 			Statement stm = con.createStatement();
 			ResultSet rs = stm.executeQuery(QUERY);
 			while(rs.next()) {
 				 cardNR = rs.getString("cardNr");
-				 Password = rs.getString("password");
+				 id = rs.getInt("id");
 			}
 			
 			rs.close();
 			stm.close();
+			final String QUERY2 = "SELECT id, hash FROM passwords WHERE  hash = '" + password + "' AND id = '" + id +"'";
+			Statement stm2 = con.createStatement();
+			ResultSet rs2 = stm2.executeQuery(QUERY2);
+			while(rs2.next()) {
+				Password = rs2.getString("hash");
+			}
+			
+			
+			
 			if(Password == null || cardNR == null) {
 				System.err.println("Password or cardNr is wrong sorry :("); 
 				return false;
@@ -105,9 +116,6 @@ public class mysqlConnector {
 				
 			}
 			
-		}catch(SQLException e ) {
-			e.printStackTrace();
-		}
 		
 		System.err.print("Sorry wrong Password please try it again\n"); 
 		return false;
@@ -121,7 +129,7 @@ public class mysqlConnector {
 	 * @throws SQLException
 	 */
 	public Account getAccount(String cardnr, String password)throws SQLException {
-		final String QUERY = "SELECT username, balance, cardNr, password FROM users WHERE password = '"+ password +"' AND cardNr = '" + cardnr + "' ORDER BY username";
+		final String QUERY = "SELECT username, balance, cardNr FROM users WHERE cardNr = '" + cardnr + "'";
 		String username = "";
 		String cardNr = "";
 		double balance = 0;
@@ -153,7 +161,7 @@ public class mysqlConnector {
 	 * @return
 	 * @throws SQLException
 	 */
-	public boolean tranfer( Account current, double balance, String cardnr)throws SQLException {
+	public void tranfer( Account current, double balance, String cardnr)throws SQLException {
 		String QUERY = "SELECT cardnr,balance FROM users WHERE cardnr =  " + cardnr; 
 		Connection con = getDB();
 		Statement stm = con.createStatement();
@@ -176,7 +184,7 @@ public class mysqlConnector {
 		
 		//sends the cash to to requested account
 		
-		return false; 
+	
 	}
 	
 	

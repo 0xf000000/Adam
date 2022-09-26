@@ -61,10 +61,12 @@ public class ATM {
 				
 				System.out.print("please Enter your Password: ");
 				 password = gh.vormatInput(in.readLine());
+				 System.out.println("vormatet Password: " + password);
 				 String hashedPassword = gh.generateHash(password);
-				if(sql.checkPassword(cardNumber,password)) {
+				 
+				if(sql.checkPassword(cardNumber,hashedPassword)) {
 					
-				current =sql.getAccount(cardNumber, password);
+				current =sql.getAccount(cardNumber, hashedPassword);
 				menu(current);
 				}else {
 					
