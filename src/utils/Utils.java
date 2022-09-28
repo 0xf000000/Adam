@@ -14,6 +14,12 @@ import java.io.IOException;
  */
 public class Utils {
 private final String PREFIX = "./AsciiArt/";
+
+public String  vormatInput(String input) {
+	input = input.replaceAll("<|>|/","");
+	
+	return input;
+}
 	
 
 /**

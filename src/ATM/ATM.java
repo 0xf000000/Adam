@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.sql.SQLException;
 
 import users.Account;
+import users.CreateNewAccount;
 import utils.Utils;
 /**
  * this class resembles an ATM
@@ -39,7 +40,7 @@ public class ATM {
 			 try {
 				 System.out.println("if you want to quit please enter 'exit'");
 				 System.out.print(" please Enter your cardnumber: ");
-				 String cardNumber =gh.vormatInput(in.readLine()); 
+				 String cardNumber =utils.vormatInput(in.readLine()); 
 				 String password = null;
 				 Account current;
 				
@@ -53,16 +54,25 @@ public class ATM {
 				if(!sql.checkCardID(cardNumber)){
 					
 					System.err.print("this account doesn't exist.\n");
-					System.out.print("do you want to create a account?");
-					return ;
+					System.out.print("do you want to create a account? Type y for continue or any char to abort the programm");
+					String y = in.readLine();
+					if(y.equals("y")) {
+						CreateNewAccount cna = new CreateNewAccount();
+						cna.createAccount();
+					}
+					
+					
+					System.out.print("ok programm abort ...");
+					System.exit(1);
 				}
 				System.out.println( sql.checkCardID(cardNumber));
 				
 				
 				System.out.print("please Enter your Password: ");
-				 password = gh.vormatInput(in.readLine());
+				 password = utils.vormatInput(in.readLine());
 				 System.out.println("vormatet Password: " + password);
-				 String hashedPassword = gh.generateHash(password);
+				 byte[] salt = sql.getSalt(cardNumber);
+				 String hashedPassword = gh.generateHash(password,salt);
 				 
 				if(sql.checkPassword(cardNumber,hashedPassword)) {
 					

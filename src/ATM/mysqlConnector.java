@@ -2,13 +2,15 @@ package ATM;
 
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.util.HashMap;
 import users.Account;
 /**
- * This class opens up a connection to our mysql database.
+ * This class opens up a connection to our mysql database. Also this class has a lot of security methods that check the password or the card Id 
+ * @TODO this needs to change maby do checkCardID or Passwd in the Security class
  * @autor leon
  * @version 1.0
  */
@@ -26,9 +28,10 @@ public class mysqlConnector {
 	}
 	
 	/**
-	 * this method checks if the card ID from the userinput exists.
+	 * this method checks if the card ID from the userinput exists. <br> 
+	 * 
 	 * @param cardNR
-	 * @return if the cardNr exists in our database this method will return true. If not false
+	 * @return if the cardNr exists in our database this method will return true. If not false 
 	 */
 	public boolean checkCardID( String cardNR){
 		Statement stm = null;
@@ -185,6 +188,41 @@ public class mysqlConnector {
 		//sends the cash to to requested account
 		
 	
+	}
+	
+	
+	public byte[] getSalt(String cardNr) {
+		final String QUERY = "SELECT id,cardNr FROM users WHERE cardNr = '" + cardNr + "'";
+		int id = 0;
+		Connection con = null;
+		byte[] salt = null;
+			try {
+				con = getDB();
+				Statement stm = con.createStatement();
+				ResultSet rs = stm.executeQuery(QUERY);
+				while(rs.next()) {
+					
+					 id = rs.getInt("id");
+				}
+				final String QUERY2 = "SELECT id,salt FROM passwords WHERE id = " + id;
+				Statement stm2 = con.createStatement();
+				ResultSet rs2 = stm2.executeQuery(QUERY2);
+				String saltfromDB = "";
+				while(rs2.next()) {
+					saltfromDB = rs2.getString("salt");
+				}
+				salt = saltfromDB.getBytes(StandardCharsets.UTF_8);
+				
+				return salt;
+				
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return null;
+			}
+			
+			
+		
 	}
 	
 	
