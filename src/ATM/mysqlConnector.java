@@ -207,11 +207,11 @@ public class mysqlConnector {
 				final String QUERY2 = "SELECT id,salt FROM passwords WHERE id = " + id;
 				Statement stm2 = con.createStatement();
 				ResultSet rs2 = stm2.executeQuery(QUERY2);
-				String saltfromDB = "";
+				
 				while(rs2.next()) {
-					saltfromDB = rs2.getString("salt");
+					salt = rs2.getBytes("salt");
 				}
-				salt = saltfromDB.getBytes(StandardCharsets.UTF_8);
+				
 				
 				return salt;
 				

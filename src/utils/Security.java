@@ -19,7 +19,9 @@ public class Security {
 	
 
 	/**
-	 * This method generates a Hash from our password with 'SHA-256'
+	 * This method takes a String and a byte array as parameters. <br>
+	 * It  generates a Hash from our password with 'SHA-256' and adds the salt into our hash.
+	 * and return it
 	 * @return the hashed Password 
 	 */
 	

@@ -15,7 +15,7 @@ import java.util.Random;
  * @author leon
  *
  */
-public class CreateNewAccount {
+public class CreateNewAccount implements ICreateNewAccount {
 private mysqlConnector sql;
 private Random random;
 private Utils utils;
@@ -29,6 +29,11 @@ private	String Password;
 		random = new Random();
 	}
 	
+	/**
+	 * this method is designed to create a new Account in our Database 
+	 * @throws IOException
+	 */
+	@Override
 	public void createAccount() throws IOException {
 		
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
@@ -51,7 +56,7 @@ private	String Password;
 	
 		int id = setUser(name);
 		
-		if(id == 0 ) {
+		if(id <= 0 ) {
 			System.err.print("sorry something went wrong :( ");
 			return; 
 		}
@@ -60,9 +65,14 @@ private	String Password;
 		SetPassword(Password , id );
 		
 	}
-	
+	/**
+	 * sets the data for our User to input and stores the user data <br> 
+	 * in the database in the users table. 
+	 * @param name
+	 * @return
+	 */
 	private int setUser(String name) {
-		double randomBalance = 0 + ( 3000 -  0) * random.nextDouble();
+		double randomBalance = 0 + ( 1000 -  0) * random.nextDouble();
 		int randomCardID = 100 + (999 - 100) * random.nextInt();
 		String QUERY= "INSERT INTO users(username,balance ,cardNr) VALUES ('" + name + "', " + randomBalance + ", " + randomCardID + ")";
 		
@@ -102,12 +112,25 @@ private	String Password;
 		Security security = new Security(); 
 		byte[] salt = security.generateSalt();
 		String hash = security.generateHash(password, salt ); 
+		
 		String saltToString = new String(salt);
 		try{
-			String QUERY = "INSERT INTO passwords(id , salt ,hash) VALUES ( " + id + "," + saltToString + ","  + hash + ")";
+			// tried a new syntax i saw in 
 			Connection con = sql.getDB();
+			PreparedStatement insert = con.prepareStatement("INSERT INTO passwords(id, salt, hash) VALUES ( "+id+", ?, '"+ hash+"')");
+            insert.setBytes(1, salt);
+            insert.executeUpdate();
+            insert.close();
+            
+			
+			
+			
+			
+			
+		/*	String QUERY = "INSERT INTO passwords(id , salt ,hash) VALUES ( " + id + "," + salt + ","  + hash + ")";
+			
 			Statement stm = con.createStatement();
-			stm.executeUpdate(QUERY);
+			stm.executeUpdate(QUERY);*/
 		}catch(Exception e) {
 			e.printStackTrace();
 			
